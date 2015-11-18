@@ -256,7 +256,11 @@ public class Functions {
 	public static final String ERROR_MESSAGE_LOCALIZE_JS                         = "Usage: ${{Structr.localize(key[, domain])}}. Example ${{Structr.localize('HELLO_WORLD', 'myDomain')}}";
 	public static final String ERROR_MESSAGE_PROPERTY_INFO                       = "Usage: ${property_info(type, name)}. Example ${property_info('User', 'name')}";
 	public static final String ERROR_MESSAGE_PROPERTY_INFO_JS                    = "Usage: ${Structr.propertyInfo(type, name)}. Example ${Structr.propertyInfo('User', 'name')}";
-
+	public static final String ERROR_MESSAGE_DISABLE_NOTIFICATIONS               = "Usage: ${disable_notifications()}";
+	public static final String ERROR_MESSAGE_DISABLE_NOTIFICATIONS_JS            = "Usage: ${Structr.disableNotifications()}";
+	public static final String ERROR_MESSAGE_ENABLE_NOTIFICATIONS                = "Usage: ${enable_notifications()}";
+	public static final String ERROR_MESSAGE_ENABLE_NOTIFICATIONS_JS             = "Usage: ${Structr.enableNotifications()}";
+	
 	// Special functions for relationships
 	public static final String ERROR_MESSAGE_INSTANTIATE                         = "Usage: ${instantiate(node)}. Example: ${instantiate(result.node)}";
 	public static final String ERROR_MESSAGE_INCOMING                            = "Usage: ${incoming(entity [, relType])}. Example: ${incoming(this, 'PARENT_OF')}";
@@ -5453,10 +5457,9 @@ public class Functions {
 				return  "";
 			}
 
-
 			@Override
 			public String usage(boolean inJavaScriptContext) {
-				return "";
+				return (inJavaScriptContext ? ERROR_MESSAGE_DISABLE_NOTIFICATIONS_JS : ERROR_MESSAGE_DISABLE_NOTIFICATIONS);
 			}
 
 			@Override
@@ -5479,10 +5482,9 @@ public class Functions {
 				return  "";
 			}
 
-
 			@Override
 			public String usage(boolean inJavaScriptContext) {
-				return "";
+				return (inJavaScriptContext ? ERROR_MESSAGE_ENABLE_NOTIFICATIONS_JS : ERROR_MESSAGE_ENABLE_NOTIFICATIONS);
 			}
 
 			@Override
