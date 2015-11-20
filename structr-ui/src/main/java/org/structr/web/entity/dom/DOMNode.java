@@ -190,9 +190,7 @@ public abstract class DOMNode extends LinkedTreeNode<DOMChildren, DOMSiblings, D
 	public static final String ERROR_MESSAGE_STRIP_HTML = "Usage: ${strip_html(html)}. Example: ${strip_html(\"<p>foo</p>\")}";
 	public static final String ERROR_MESSAGE_STRIP_HTML_JS = "Usage: ${{Structr.strip_html(html)}}. Example: ${{Structr.strip_html(\"<p>foo</p>\")}}";
 	public static final String ERROR_MESSAGE_POST = "Usage: ${POST(URL, body [, contentType, charset])}. Example: ${POST('http://localhost:8082/structr/rest/folders', '{name:Test}', 'application/json', 'utf-8')}";
-	;
 	public static final String ERROR_MESSAGE_POST_JS = "Usage: ${{Structr.POST(URL, body [, contentType, charset])}}. Example: ${{Structr.POST('http://localhost:8082/structr/rest/folders', '{name:\"Test\"}', 'application/json', 'utf-8')}}";
-	;
 	public static final String ERROR_MESSAGE_GET = "Usage: ${GET(URL[, contentType[, selector]])}. Example: ${GET('http://structr.org', 'text/html')}";
 	public static final String ERROR_MESSAGE_GET_JS = "Usage: ${{Structr.GET(URL[, contentType[, selector]])}}. Example: ${{Structr.HEAD('http://structr.org', 'text/html')}}";
 	public static final String ERROR_MESSAGE_HEAD = "Usage: ${HEAD(URL[, username, password])}. Example: ${HEAD('http://structr.org', 'foo', 'bar')}";
@@ -207,10 +205,8 @@ public abstract class DOMNode extends LinkedTreeNode<DOMChildren, DOMSiblings, D
 	public static final String ERROR_MESSAGE_ADD_HEADER_JS = "Usage: ${{Structr.add_header(field, value)}}. Example: ${{Structr.add_header('X-User', 'johndoe')}}";
 	public static final String ERROR_MESSAGE_SET_RESPONSE_HEADER = "Usage: ${set_response_header(field, value)}. Example: ${set_response_header('X-User', 'johndoe')}";
 	public static final String ERROR_MESSAGE_SET_RESPONSE_HEADER_JS = "Usage: ${{Structr.setResponseHeader(field, value)}}. Example: ${{Structr.setResponseHeader('X-User', 'johndoe')}}";
-
 	public static final String ERROR_MESSAGE_LOG_EVENT = "Usage: ${log_event(action, message)}. Example: ${log_event('read', 'Book has been read')}";
 	public static final String ERROR_MESSAGE_LOG_EVENT_JS = "Usage: ${{Structr.logEvent(action, message)}}. Example: ${{Structr.logEvent('read', 'Book has been read')}}";
-
 	public static final String ERROR_MESSAGE_IS_LOCALE = "Usage: ${is_locale(locales...)}";
 	public static final String ERROR_MESSAGE_IS_LOCALE_JS = "Usage: ${{Structr.isLocale(locales...}}. Example ${{Structr.isLocale('de_DE', 'de_AT', 'de_CH')}}";
 
