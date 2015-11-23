@@ -225,7 +225,6 @@ public class ResourceHelper {
 
 			} catch (Throwable t) {
 
-				t.printStackTrace();
 				// ignore exceptions thrown here
 			}
 
