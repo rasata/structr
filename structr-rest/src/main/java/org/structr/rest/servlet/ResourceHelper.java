@@ -225,6 +225,7 @@ public class ResourceHelper {
 
 			} catch (Throwable t) {
 
+				t.printStackTrace();
 				// ignore exceptions thrown here
 			}
 
@@ -246,6 +247,9 @@ public class ResourceHelper {
 
 			return finalResource;
 
+		} else {
+
+			logger.log(Level.WARNING, "Resource chain evaluation resulted in {0} entries, returning status code 400.", resourceChain.size());
 		}
 
 		throw new IllegalPathException();
