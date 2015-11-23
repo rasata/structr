@@ -165,7 +165,6 @@ public class RestDataSource implements GraphDataSource<List<GraphObject>> {
 
 		} catch (IllegalPathException | NotFoundException e) {
 
-			e.printStackTrace();
 			logger.log(Level.WARNING, "Illegal path for REST query: {0}", restQuery);
 
 		}
