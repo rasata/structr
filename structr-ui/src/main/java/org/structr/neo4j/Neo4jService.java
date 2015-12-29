@@ -18,10 +18,12 @@
  */
 package org.structr.neo4j;
 
+import java.util.logging.Filter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.configuration.Configuration;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
 import org.structr.common.StructrConf;
@@ -41,7 +43,7 @@ public class Neo4jService implements RunnableService {
 
 	private static int port;
 	private static String host;
-	private WrappingNeoServerBootstrapper neoServerBootstrapper;
+	private StructrWrappingCommunityNeoServer neoServerBootstrapper;
 
 	public static final String NEO4J_BROWSER_HOST          = "neo4j.server.host";
 	public static final String NEO4J_BROWSER_PORT          = "neo4j.server.port";
@@ -52,20 +54,27 @@ public class Neo4jService implements RunnableService {
 
 
 		try {
-			GraphDatabaseAPI api = (GraphDatabaseAPI) StructrApp.getInstance().getGraphDatabaseService();
+			final GraphDatabaseAPI api = (GraphDatabaseAPI) StructrApp.getInstance().getGraphDatabaseService();
+			final ServerConfigurator config = new ServerConfigurator(api);
+			final Configuration configuration = config.configuration();
+				
+			configuration.addProperty(Configurator.WEBSERVER_ADDRESS_PROPERTY_KEY, host);
+			configuration.addProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY, port);
 
-			ServerConfigurator config = new ServerConfigurator(api);
-
-			config.configuration()
-				.addProperty(Configurator.WEBSERVER_ADDRESS_PROPERTY_KEY, host);
-
-			config.configuration()
-				.addProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY, port);
-
-			logger.log(Level.INFO, "Starting Neo4j server on port {0}", new Object[] { String.valueOf(port) });
-
-			neoServerBootstrapper = new WrappingNeoServerBootstrapper(api, config);
+			logger.log(Level.INFO, "Starting Neo4j server on host {0} and port {1}", new Object[] { host, String.valueOf(port) });
+			
+			// Save current logger config
+			final Level oldLevel        = Logger.getLogger("").getLevel();
+			final Filter oldFilter      = Logger.getLogger("").getFilter();
+			final Handler[] oldHandlers = Logger.getLogger("").getHandlers();
+			
+			neoServerBootstrapper = new StructrWrappingCommunityNeoServer(api, config);
 			neoServerBootstrapper.start();
+			
+			// Reset to old logger config (Neo4j's Bootstrapper changes global log level)
+			resetLogger(Logger.getLogger(""), oldLevel, oldFilter, oldHandlers);
+			
+			logger.log(Level.INFO, "Neo4j server started on port {0}", new Object[] { String.valueOf(port) });
 
 		} catch (Exception e) {
 
@@ -138,7 +147,7 @@ public class Neo4jService implements RunnableService {
 
 	@Override
 	public String getName() {
-		return WrappingNeoServerBootstrapper.class.getSimpleName();
+		return Neo4jService.class.getSimpleName();
 	}
 
 	@Override
@@ -146,4 +155,18 @@ public class Neo4jService implements RunnableService {
 		return false;
 	}
 
+	private void resetLogger(final Logger logger, final Level oldLevel, final Filter oldFilter, final Handler[] oldHandlers) {
+
+		logger.setLevel(oldLevel);
+		logger.setFilter(oldFilter);
+
+		for (final Handler h : Logger.getLogger("").getHandlers()) {
+			logger.removeHandler(h);
+		}
+
+		for (final Handler h : oldHandlers) {
+			logger.addHandler(h);
+		}
+	}
+	
 }
