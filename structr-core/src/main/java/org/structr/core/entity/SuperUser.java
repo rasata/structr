@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
 import org.structr.cmis.CMISInfo;
 import org.structr.common.AccessControllable;
 import org.structr.common.Permission;
@@ -497,11 +498,16 @@ public class SuperUser implements Principal, AccessControllable {
 	}
 
 	@Override
-	public void setRelationshipPathSegment(final RelationshipInterface pathElement) {
+	public String getSalt() {
+		return null;
 	}
 
 	@Override
-	public RelationshipInterface getRelationshipPathSegment() {
+	public void setRawPathSegment(final Relationship rawSegment) {
+	}
+
+	@Override
+	public Relationship getRawPathSegment() {
 		return null;
 	}
 

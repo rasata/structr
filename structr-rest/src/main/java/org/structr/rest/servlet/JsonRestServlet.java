@@ -94,6 +94,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 		commonRequestParameters.add(REQUEST_PARAMETER_OFFSET_ID);
 		commonRequestParameters.add(REQUEST_PARAMETER_SORT_KEY);
 		commonRequestParameters.add(REQUEST_PARAMETER_SORT_ORDER);
+		commonRequestParameters.add("debugLoggingEnabled");
 
 		// cross reference here, but these need to be added as well..
 		commonRequestParameters.add(SearchCommand.DISTANCE_SEARCH_KEYWORD);
@@ -164,7 +165,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 			// first thing to do!
 			request.setCharacterEncoding("UTF-8");
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType("application/json; charset=utf-8");
+			response.setContentType("application/json; charset=utf-8;");
 
 			// isolate request authentication in a transaction
 			try (final Tx tx = StructrApp.getInstance().tx()) {
@@ -285,7 +286,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 			// first thing to do!
 			request.setCharacterEncoding("UTF-8");
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType("application/json; charset=utf-8");
+			response.setContentType("application/json; charset=utf-8;");
 
 			// isolate request authentication in a transaction
 			try (final Tx tx = StructrApp.getInstance().tx()) {
@@ -389,7 +390,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 			// first thing to do!
 			request.setCharacterEncoding("UTF-8");
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType("application/json; charset=utf-8");
+			response.setContentType("application/json; charset=utf-8;");
 
 			// isolate request authentication in a transaction
 			try (final Tx tx = StructrApp.getInstance().tx()) {
@@ -572,7 +573,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 			// first thing to do!
 			request.setCharacterEncoding("UTF-8");
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType("application/json; charset=utf-8");
+			response.setContentType("application/json; charset=utf-8;");
 
 			// isolate request authentication in a transaction
 			try (final Tx tx = StructrApp.getInstance().tx()) {
@@ -682,7 +683,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 	protected void doTrace(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 //		logRequest("TRACE", request);
-		response.setContentType("application/json; charset=UTF-8");
+		response.setContentType("application/json; charset=UTF-8;");
 		response.setCharacterEncoding("UTF-8");
 
 		int code = HttpServletResponse.SC_METHOD_NOT_ALLOWED;
@@ -745,7 +746,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 			// first thing to do!
 			request.setCharacterEncoding("UTF-8");
 			response.setCharacterEncoding("UTF-8");
-			response.setContentType("application/json; charset=utf-8");
+			response.setContentType("application/json; charset=utf-8;");
 
 			// isolate request authentication in a transaction
 			try (final Tx tx = StructrApp.getInstance().tx()) {
@@ -838,7 +839,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 					// isolate write output
 					try (final Tx tx = app.tx()) {
 
-						response.setContentType("text/html; charset=utf-8");
+						response.setContentType("text/html; charset=utf-8;");
 
 						try (final Writer writer = response.getWriter()) {
 
@@ -856,7 +857,7 @@ public class JsonRestServlet extends HttpServlet implements HttpServiceServlet {
 					// isolate write output
 					try (final Tx tx = app.tx()) {
 
-						response.setContentType("application/json; charset=utf-8");
+						response.setContentType("application/json; charset=utf-8;");
 						try (final Writer writer = response.getWriter()) {
 
 							jsonStreamer.stream(securityContext, writer, result, baseUrl);

@@ -20,6 +20,7 @@ package org.structr.web.common;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,7 +51,7 @@ public class RenderContext extends ActionContext {
 	private static final Logger logger = Logger.getLogger(RenderContext.class.getName());
 
 	private final Map<String, GraphObject> dataObjects = new LinkedHashMap<>();
-	private final long renderStartTime                 = System.currentTimeMillis();
+	private final Stack<SecurityContext> scStack       = new Stack<>();
 	private EditMode editMode                          = EditMode.NONE;
 	private AsyncBuffer buffer                         = new AsyncBuffer();
 	private int depth                                  = 0;
@@ -167,6 +168,26 @@ public class RenderContext extends ActionContext {
 
 	public void setRelatedProperty(final PropertyKey relatedProperty) {
 		this.relatedProperty = relatedProperty;
+	}
+
+	/**
+	 * Pushes the current security context on the stack of security
+	 * contexts and installs the given security context until a call
+	 * to {@link popSecurityContext} is made.
+	 *
+	 * @param securityContext
+	 */
+	public void pushSecurityContext(final SecurityContext securityContext) {
+
+		scStack.push(this.securityContext);
+		this.securityContext = securityContext;
+	}
+
+	public void popSecurityContext() {
+
+		if (!scStack.isEmpty()) {
+			this.securityContext = scStack.pop();
+		}
 	}
 
 	/**
@@ -328,10 +349,6 @@ public class RenderContext extends ActionContext {
 	public boolean returnRawValue() {
 		final EditMode editMode = getEditMode(securityContext.getUser(false));
 		return ((EditMode.RAW.equals(editMode) || EditMode.WIDGET.equals(editMode)));
-	}
-
-	public boolean hasTimeout(final long timeout) {
-		return System.currentTimeMillis() > (renderStartTime + timeout);
 	}
 
 	@Override

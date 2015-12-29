@@ -26,10 +26,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -45,26 +47,25 @@ import org.structr.core.entity.Principal;
 import static org.structr.core.graph.NodeInterface.owner;
 import org.structr.core.graph.NodeService;
 import org.structr.core.graph.Tx;
-import org.structr.web.entity.FileBase;
-import static org.structr.web.entity.FileBase.extractedContent;
+import org.structr.web.entity.Indexable;
 import org.structr.web.entity.User;
 
 /**
  *
  *
  */
-public class FulltextIndexingAgent extends Agent<FileBase> {
+public class FulltextIndexingAgent extends Agent<Indexable> {
 
 	private static final Logger logger = Logger.getLogger(FulltextIndexingAgent.class.getName());
 	private static final Map<String, Set<String>> languageStopwordMap = new LinkedHashMap<>();
 	public static final String TASK_NAME                              = "FulltextIndexing";
 
 	@Override
-	public ReturnValue processTask(final Task<FileBase> task) throws Throwable {
+	public ReturnValue processTask(final Task<Indexable> task) throws Throwable {
 
 		if (TASK_NAME.equals(task.getType())) {
 
-			for (final FileBase file : task.getNodes()) {
+			for (final Indexable file : task.getNodes()) {
 
 				doIndexing(file);
 			}
@@ -87,7 +88,7 @@ public class FulltextIndexingAgent extends Agent<FileBase> {
 	}
 
 	// ----- private methods -----
-	private void doIndexing(final FileBase file) {
+	private void doIndexing(final Indexable file) {
 
 		boolean parsingSuccessful         = false;
 		InputStream inputStream           = null;
@@ -124,7 +125,7 @@ public class FulltextIndexingAgent extends Agent<FileBase> {
 						file.getSecurityContext().preventModificationOfAccessTime();
 
 						// save raw extracted text
-						file.setProperty(extractedContent, tokenizer.getRawText());
+						file.setProperty(Indexable.extractedContent, tokenizer.getRawText());
 
 						// tokenize name
 						tokenizer.write(getName());
@@ -159,11 +160,10 @@ public class FulltextIndexingAgent extends Agent<FileBase> {
 					final NodeService nodeService       = Services.getInstance().getService(NodeService.class);
 					final Index<Node> fulltextIndex     = nodeService.getNodeIndex(NodeService.NodeIndex.fulltext);
 					final Set<String> stopWords         = languageStopwordMap.get(tokenizer.getLanguage());
-					final String indexKeyName           = FileBase.indexedContent.jsonName();
+					final String indexKeyName           = Indexable.indexedWords.jsonName();
 					final Iterator<String> wordIterator = tokenizer.getWords().iterator();
-					final StringBuilder buf             = new StringBuilder();
 					final Node node                     = file.getNode();
-					int indexedWords                    = 0;
+					final Set<String> indexedWords      = new TreeSet<>();
 
 					logger.log(Level.INFO, "Indexing {0}..", fileName);
 
@@ -176,17 +176,18 @@ public class FulltextIndexingAgent extends Agent<FileBase> {
 
 							while (wordIterator.hasNext()) {
 
-								final String word = wordIterator.next();
+								// strip double quotes
+								final String word = StringUtils.strip(wordIterator.next(), "\"");
 
 								if (!stopWords.contains(word)) {
 
-									buf.append(word).append(" ");
+									indexedWords.add(word);
 									fulltextIndex.add(node, indexKeyName, word);
 
-									if (indexedWords > 1000) {
-										indexedWords = 0;
-										break;
-									}
+//									if (indexedWords > 1000) {
+//										indexedWords = 0;
+//										break;
+//									}
 								}
 							}
 
@@ -201,7 +202,7 @@ public class FulltextIndexingAgent extends Agent<FileBase> {
 						file.getSecurityContext().preventModificationOfAccessTime();
 
 						// store indexed words
-						file.setProperty(FileBase.indexedWords, buf.toString());
+						file.setProperty(Indexable.indexedWords, (String[]) indexedWords.toArray(new String[indexedWords.size()]));
 
 						tx.success();
 					}

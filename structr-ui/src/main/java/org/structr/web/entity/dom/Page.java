@@ -111,15 +111,20 @@ public class Page extends DOMNode implements Linkable, Document, DOMImplementati
 	public static final Property<List<DOMNode>> elements = new StartNodes<>("elements", PageLink.class);
 	public static final Property<Boolean> isPage = new BooleanProperty("isPage").defaultValue(true).readOnly();
 	public static final Property<Boolean> dontCache = new BooleanProperty("dontCache").defaultValue(false);
+
+	// if enabled, prevents asynchronous page rendering; enable this flag when using the stream() builtin method
+	public static final Property<Boolean> pageCreatesRawData = new BooleanProperty("pageCreatesRawData").defaultValue(false);
+
+
         public static final Property<String> path = new StringProperty("path").indexed();
 	public static final Property<Site> site = new StartNode<>("site", Pages.class, new UiNotion()).indexedWhenEmpty();
 
 	public static final org.structr.common.View publicView = new org.structr.common.View(Page.class, PropertyView.Public,
-		path, children, linkingElements, contentType, owner, cacheForSeconds, version, showOnErrorCodes, isPage, site, dontCache
+		path, children, linkingElements, contentType, owner, cacheForSeconds, version, showOnErrorCodes, isPage, site, dontCache, pageCreatesRawData, enableBasicAuth, basicAuthRealm
 	);
 
 	public static final org.structr.common.View uiView = new org.structr.common.View(Page.class, PropertyView.Ui,
-		path, children, linkingElements, contentType, owner, cacheForSeconds, version, position, showOnErrorCodes, isPage, site, dontCache
+		path, children, linkingElements, contentType, owner, cacheForSeconds, version, position, showOnErrorCodes, isPage, site, dontCache, pageCreatesRawData, enableBasicAuth, basicAuthRealm
 	);
 
 	private Html5DocumentType docTypeNode = null;
@@ -143,19 +148,6 @@ public class Page extends DOMNode implements Linkable, Document, DOMImplementati
 	public void updateFromNode(final DOMNode newNode) throws FrameworkException {
 		// do nothing
 	}
-
-//	@Override
-//	public void updateFromPropertyMap(final PropertyMap properties) throws FrameworkException {
-//
-//		if (properties.containsKey(NodeInterface.name)) {
-//
-//			final String newName = properties.get(NodeInterface.name);
-//			if (newName != null) {
-//
-//				setProperty(NodeInterface.name, newName);
-//			}
-//		}
-//	}
 
 	@Override
 	public boolean isValid(ErrorBuffer errorBuffer) {
@@ -915,7 +907,9 @@ public class Page extends DOMNode implements Linkable, Document, DOMImplementati
 	@Override
 	public String getAbsolutePath() {
 		try (Tx tx = StructrApp.getInstance().tx()) {
-			return getPath();
+			final String path = getPath();
+			tx.success();
+			return path;
 		} catch (FrameworkException fex) {
 			logger.log(Level.SEVERE, "Error in getPath() of abstract ftp file", fex);
 		}

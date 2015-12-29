@@ -310,7 +310,7 @@ public class HttpService implements RunnableService {
 			gzipFilter.setInitParameter("bufferSize", "32768");
 			gzipFilter.setInitParameter("minGzipSize", "256");
 			gzipFilter.setInitParameter("deflateCompressionLevel", "9");
-			gzipFilter.setInitParameter("methods", "GET,POST");
+			gzipFilter.setInitParameter("methods", "GET,POST,PUT,HEAD,DELETE");
 			servletContext.addFilter(gzipFilter, "/*", EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC));
 
 		}
@@ -375,6 +375,7 @@ public class HttpService implements RunnableService {
 			}
 
 			final RequestLogImpl requestLog = new RequestLogImpl();
+			requestLog.setName("REQUESTLOG");
 			requestLogHandler.setRequestLog(requestLog);
 
 			final HandlerCollection handlers = new HandlerCollection();

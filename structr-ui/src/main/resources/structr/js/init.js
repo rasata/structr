@@ -297,10 +297,15 @@ var Structr = {
 		$('#logout_').html('Logout <span class="username">' + user + '</span>');
 		Structr.loadInitialModule();
 		Structr.startPing();
-		var dialogData = JSON.parse(LSWrapper.getItem(dialogDataKey));
-		//console.log('Dialog data after init', dialogData);
-		if (dialogData) {
-			Structr.restoreDialog(dialogData);
+		
+		if (!dialogText.text().length) {
+			LSWrapper.removeItem(dialogDataKey);
+		} else {
+			var dialogData = JSON.parse(LSWrapper.getItem(dialogDataKey));
+			//console.log('Dialog data after init', dialogData, dialogText.text().length);
+			if (dialogData) {
+				Structr.restoreDialog(dialogData);
+			}
 		}
 		hideLoadingSpinner();
 	},
@@ -690,7 +695,7 @@ var Structr = {
 	},
 	errorFromResponse: function(response, url) {
 		var errorText = '';
-        
+
 		if (response.errors && response.errors.length) {
 
 			$.each(response.errors, function(i, err) {
@@ -1284,20 +1289,22 @@ var Structr = {
 	},
 	updateVersionInfo: function() {
 		$.get(rootUrl + '_env', function(envInfo) {
-			var ui = envInfo.result.modules['structr-ui'];
-			if (ui !== null) {
+			if (envInfo && envInfo.result) {
+				var ui = envInfo.result.modules['structr-ui'];
+				if (ui !== null) {
 
-				var version = ui.version;
-				var build = ui.build;
-				var date = ui.date;
-				var versionLink;
-				if (version.endsWith('SNAPSHOT')) {
-					versionLink = 'https://oss.sonatype.org/content/repositories/snapshots/org/structr/structr-ui/' + version;
-				} else {
-					versionLink = 'http://repo1.maven.org/maven2/org/structr/structr-ui/' + version;
+					var version = ui.version;
+					var build = ui.build;
+					var date = ui.date;
+					var versionLink;
+					if (version.endsWith('SNAPSHOT')) {
+						versionLink = 'https://oss.sonatype.org/content/repositories/snapshots/org/structr/structr-ui/' + version;
+					} else {
+						versionLink = 'http://repo1.maven.org/maven2/org/structr/structr-ui/' + version;
+					}
+					$('.structr-version').html('<a target="_blank" href="' + versionLink + '">' + version + '</a> build <a target="_blank" href="https://github.com/structr/structr/commit/' + build + '">' + build + '</a> (' + date + ')');
+
 				}
-				$('.structr-version').html('<a target="_blank" href="' + versionLink + '">' + version + '</a> build <a target="_blank" href="https://github.com/structr/structr/commit/' + build + '">' + build + '</a> (' + date + ')');
-
 			}
 		});
 	},
@@ -1370,6 +1377,16 @@ var Structr = {
 	},
 	doDeselectAllTabs: function () {
 		$('#resourceTabsMenu li:not(.last) input[type="checkbox"]:checked').click();
+	},
+	doSelectTabs: function (types) {
+		types.forEach(function(type) {
+			$('#resourceTabsMenu li:not(.last) a[href="#' + type + '"] input[type="checkbox"]:not(:checked)').click();
+		});
+	},
+	doDeselectTabs: function (types) {
+		types.forEach(function(type) {
+			$('#resourceTabsMenu li:not(.last) a[href="#' + type + '"] input[type="checkbox"]:checked').click();
+		});
 	},
 	getId: function(element) {
 		return Structr.getIdFromPrefixIdString($(element).prop('id'), 'id_') || undefined;
@@ -1672,11 +1689,13 @@ function setPosition(parentId, nodeUrl, pos) {
 var keyEventBlocked = true;
 var keyEventTimeout;
 
-$(window).unload(function() {
-	log('########################################### unload #####################################################');
-	// Remove dialog data in case of page reload
-	LSWrapper.removeItem(dialogDataKey);
-	Structr.saveLocalStorage();
+$(window).on('unload', function(event) {
+	if (event.target === document) {
+		log('########################################### unload #####################################################');
+		// Remove dialog data in case of page reload
+		LSWrapper.removeItem(dialogDataKey);
+		Structr.saveLocalStorage();
+	}
 });
 
 function showLoadingSpinner() {

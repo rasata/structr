@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.structr.common.AccessPathCache;
 import org.structr.common.StructrConf;
 import org.structr.common.error.ErrorBuffer;
 import org.structr.common.error.FrameworkException;
@@ -128,6 +129,9 @@ public class SchemaService implements Service {
 					// this is a very critical section :)
 					synchronized (SchemaService.class) {
 
+						// clear propagating relationship cache (test)
+						SchemaRelationshipNode.clearPropagatingRelationshipTypes();
+
 						// compile all classes at once and register
 						Map<String, Class> newTypes = nodeExtender.compile(errorBuffer);
 
@@ -151,6 +155,7 @@ public class SchemaService implements Service {
 					SearchCommand.clearInheritanceMap();
 					NodeFactory.invalidateCache();
 					RelationshipFactory.invalidateCache();
+					AccessPathCache.invalidate();
 
 					success = !errorBuffer.hasError();
 
